@@ -23,19 +23,3 @@ sudo rpm -Uvh http://packages.microsoft.com/config/rhel/7/packages-microsoft-pro
 
 # Install PowerShell using yum
 yum install -y powershell
-
-sleep 5
-echo 'Installing Powershell DSC for Linux'
-wget https://github.com/Microsoft/omi/releases/download/v1.1.0-0/omi-1.1.0.ssl_100.x64.rpm \
-  -O /opt/omi.rpm
-wget https://github.com/Microsoft/PowerShell-DSC-for-Linux/releases/download/v1.1.1-294/dsc-1.1.1-294.ssl_100.x64.rpm \
-  -O /opt/dsc.rpm
-sudo rpm -Uvh /opt/omi.rpm /opt/dsc.rpm
-
-echo 'Pausing for 5 secs'
-sleep 5
-
-echo 'Configuring sshd'
-cp -p /vagrant/config/sshd_config /etc/ssh/sshd_config
-chmod 644 /etc/ssh/sshd_config
-service sshd restart
