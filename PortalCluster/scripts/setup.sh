@@ -5,7 +5,7 @@
 ##################################################
 
 # Install packages
-yum install -y net-tools-2.0-0.17.20131004git.el7.x86_64
+yum install -y net-tools.x86_64
 
 # Set timezone (http://www.thegeekstuff.com/2010/09/change-timezone-in-linux/)
 rm -f /etc/localtime

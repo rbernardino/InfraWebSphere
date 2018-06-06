@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnet-name": {
+      "value": "azure-vnet"
+    },
+    "vmSubnetName": {
+      "value": "azure-portal"
+    },
+    "vmNicNameSuffix": {
+      "value": "-nic"
+    },
+    "vmAdminUserName": {
+      "value": "linuxadmin"
+    },
+    "sshKeyData": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCl873xVJuZRhnNmgUN6SYnghNZsvIapxstGJmSj9ghkgwIkiHdanoAcJb5zEzlAPXxSZnzJZ3Ribm/YmnXB2qm10zTdHUzIVuoBX51uxJTriNHnxue/4vwXDadBmFqoJhzQ2VGAu1xSFDAnvF/uyzQpxtOIswrIrCJ5BfTW22CejV46387YI+vGFy2IP66502TZQc78zVDtr/NCkWfX99zUmpQd9zxjhV/Pr5NINmn0k8DgkK+F9Cpg4TZfutms9oH81DgQRQ933zSH8meA/qN+8XdpWqQuL0ATg0usTBQcMPrLlOtm0sdkj+XG4cCrlOgS8N5QeuEfQJslsJY4XOX ryan@win10"
+    },
+    "vmNamePrefix": {
+      "value": "member0"
+    },
+    "vmSize": {
+      "value": "Standard_B1S"
+    },
+    "storageAccountName": {
+      "value": "portalstoragestd"
+    }
+  }
+}

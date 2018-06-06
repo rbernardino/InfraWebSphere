@@ -1,0 +1,187 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmAdminUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "User name for the Virtual Machine."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
+    "vnet-name": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "The virtual network where this Virtual Machine will be placed"
+      }
+    },
+    "vmSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The subnet where this Virtual Machine will be placed."
+      }
+    },
+    "vmNicNameSuffix": {
+      "type": "string"
+    },
+    "vmNamePrefix": {
+      "type": "string"
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "The size or SKU of the Virtual Machine."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The storage account name for this Virtual Machine."
+      }
+    }
+  },
+  "variables": {
+    "vmSize": "[parameters('vmSize')]",
+    "centOSVersion": "7.3",
+    "vmPublicIpDnsName": "[concat('portal', uniquestring(resourceGroup().id))]",
+    "location": "[resourceGroup().location]",
+    "vmImagePublisher": "OpenLogic",
+    "vmImageOffer": "CentOS",
+    "vm-subnet-name": "[parameters('vmSubnetName')]",
+    "networkResourceGroup": "azureNetwork",
+    "nicCount": 1,
+    "vmCount": 1,
+    "publiIpCount": 1,
+    "vmSubnetRef": "[resourceId( variables('networkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet-name') )]",
+    "vmSubnet": "[concat(variables('vmSubnetRef'), '/subnets/', variables('vm-subnet-name'))]",
+    "vmPublicIpName": "[concat(parameters('vmNamePrefix'), '-public-ip')]",
+    "publicIPAddressType": "Dynamic",
+    "sshKeyPath": "[concat('/home/',parameters('vmAdminUserName'),'/.ssh/authorized_keys')]",
+    "apiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('apiVersion')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat(variables('vmPublicIpName'), add(copyIndex(),1))]",
+      "location": "[variables('location')]",
+      "copy": {
+        "name": "publicIpCount",
+        "count": "[variables('publiIpCount')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('vmPublicIpDnsName'), add(copyIndex(),1))]"
+        }
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersion')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat( parameters('vmNamePrefix'), add(copyIndex(),1), parameters('vmNicNameSuffix'))]",
+      "location": "[variables('location')]",
+      "copy": {
+        "name": "nicCopy",
+        "count": "[variables('nicCount')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('vmPublicIpName'), add(copyIndex(),1))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmPublicIpName'), add(copyIndex(),1)))]"
+              },
+              "subnet": {
+                "id": "[variables('vmSubnet')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2016-04-30-preview",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmNamePrefix'), add(copyIndex(),1))]",
+      "location": "[variables('location')]",
+      "copy": {
+        "name": "vmCopy",
+        "count": "[variables('vmCount')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', concat( parameters('vmNamePrefix'), add(copyIndex(),1), parameters('vmNicNameSuffix')) )]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmNamePrefix'), add(copyIndex(),1))]",
+          "adminUsername": "[parameters('vmAdminUserName')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('vmImagePublisher')]",
+            "offer": "[variables('vmImageOffer')]",
+            "sku": "[variables('centOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat( parameters('vmNamePrefix'), add(copyIndex(),1), parameters('vmNicNameSuffix')))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "name": "[parameters('storageAccountName')]",
+      "apiVersion": "2016-01-01",
+      "location": "[variables('location')]",
+      "tags": {},
+      "scale": null,
+      "properties": {},
+      "dependsOn": []
+    }
+  ],
+  "outputs": {
+    "sshCommand": {
+      "type": "string",
+      "value": "[concat('ssh ', parameters('vmAdminUserName'), '@', variables('vmPublicIpDnsName'), '.', resourceGroup().location, '.cloudapp.azure.com')]"
+    }
+  }
+}
