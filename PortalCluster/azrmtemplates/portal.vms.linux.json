@@ -150,6 +150,11 @@
             "version": "latest"
           },
           "osDisk": {
+            "name": "[concat(parameters('vmNamePrefix'), add(copyIndex(),1), '-OsDisk')]",
+            "vhd": {
+              "uri": "[concat('https', '://', parameters('storageAccountName'), '.blob.core.windows.net', concat('/vhds/', concat(parameters('vmNamePrefix'), add(copyIndex(),1)), '-OsDisk','.vhd'))]"
+            },
+            "caching": "ReadWrite",
             "createOption": "FromImage"
           }
         },
