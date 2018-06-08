@@ -7,6 +7,9 @@
 # Install packages
 yum install -y net-tools.x86_64
 
+# Use in mounting Azure file shares (https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-linux)
+yum install -y install cifs-utils
+
 # Set timezone (http://www.thegeekstuff.com/2010/09/change-timezone-in-linux/)
 rm -f /etc/localtime
 ln -s /usr/share/zoneinfo/Asia/Singapore /etc/localtime
