@@ -48,7 +48,7 @@
   },
   "variables": {
     "vmSize": "[parameters('vmSize')]",
-    "centOSVersion": "7.3",
+    "centOSVersion": "7.4",
     "vmPublicIpDnsName": "[concat('portal', uniquestring(resourceGroup().id))]",
     "location": "[resourceGroup().location]",
     "vmImagePublisher": "OpenLogic",
