@@ -44,23 +44,37 @@
       "metadata": {
         "description": "The storage account name for this Virtual Machine."
       }
+    },
+    "vmLinuxOSVersion": {
+      "type": "string"
+    },
+    "vmImagePublisher": {
+      "type": "string"
+    },
+    "vmImageOffer": {
+      "type": "string"
+    },
+    "networkResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "The network resource group name where the virtual network is located."
+      }
     }
   },
   "variables": {
     "vmSize": "[parameters('vmSize')]",
-    "centOSVersion": "7.4",
+    "OSVersion": "[parameters('vmLinuxOSVersion')]",
     "vmPublicIpDnsName": "[concat('portal', uniquestring(resourceGroup().id))]",
     "location": "[resourceGroup().location]",
-    "vmImagePublisher": "OpenLogic",
-    "vmImageOffer": "CentOS",
+    "vmImagePublisher": "[parameters('vmImagePublisher')]",
+    "vmImageOffer": "[parameters('vmImageOffer')]",
     "vm-subnet-name": "[parameters('vmSubnetName')]",
-    "networkResourceGroup": "azureNetwork",
+    "networkResourceGroup": "[parameters('networkResourceGroup')]",
     "nicCount": 1,
     "vmCount": 1,
     "publiIpCount": 1,
     "vmSubnetRef": "[resourceId( variables('networkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet-name') )]",
     "vmSubnet": "[concat(variables('vmSubnetRef'), '/subnets/', variables('vm-subnet-name'))]",
-    "vmPublicIpName": "[concat(parameters('vmNamePrefix'), '-public-ip')]",
     "publicIPAddressType": "Dynamic",
     "sshKeyPath": "[concat('/home/',parameters('vmAdminUserName'),'/.ssh/authorized_keys')]",
     "apiVersion": "2015-06-15"
@@ -69,7 +83,7 @@
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('vmPublicIpName'), add(copyIndex(),1))]",
+      "name": "[concat(parameters('vmNamePrefix'), add(copyIndex(),1), '-public-ip')]",
       "location": "[variables('location')]",
       "copy": {
         "name": "publicIpCount",
@@ -92,7 +106,7 @@
         "count": "[variables('nicCount')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('vmPublicIpName'), add(copyIndex(),1))]"
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('vmNamePrefix'), add(copyIndex(),1), '-public-ip')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -101,7 +115,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmPublicIpName'), add(copyIndex(),1)))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), add(copyIndex(),1), '-public-ip'))]"
               },
               "subnet": {
                 "id": "[variables('vmSubnet')]"
@@ -146,7 +160,7 @@
           "imageReference": {
             "publisher": "[variables('vmImagePublisher')]",
             "offer": "[variables('vmImageOffer')]",
-            "sku": "[variables('centOSVersion')]",
+            "sku": "[variables('OSVersion')]",
             "version": "latest"
           },
           "osDisk": {

@@ -25,6 +25,18 @@
     },
     "storageAccountName": {
       "value": "portalstoragestd"
+    },
+    "vmLinuxOSVersion": {
+      "value": "7.4"
+    },
+    "vmImagePublisher": {
+      "value": "OpenLogic"
+    },
+    "vmImageOffer": {
+      "value": "CentOS"
+    },
+    "networkResourceGroup": {
+      "value": "azureNetwork"
     }
   }
 }

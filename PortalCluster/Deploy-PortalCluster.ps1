@@ -5,8 +5,8 @@ break
   $location = 'East US'
   $resourceGroupName = 'azurePortalServers'
   $resourceDeploymentName = 'azurePortalServers-deployment'
-  $templateFile = '.\azrmtemplates\portal.vms.linux.json'
-  $templateParameterFile = '.\azrmtemplates\portal.vms.linux.parameters.json'
+  $templateFile = '.\azrmtemplates\linux.json'
+  $templateParameterFile = '.\azrmtemplates\portal.centos.parameters.json'
 
   New-AzureRmJsonTemplateDeployment `
     -ResourceGroupName $resourceGroupName `
