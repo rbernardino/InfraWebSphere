@@ -23,9 +23,6 @@
     "vmSize": {
       "value": "Standard_B1S"
     },
-    "storageAccountName": {
-      "value": "portalstoragestd"
-    },
     "vmLinuxOSVersion": {
       "value": "7.4"
     },

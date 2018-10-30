@@ -39,12 +39,6 @@
         "description": "The size or SKU of the Virtual Machine."
       }
     },
-    "storageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "The storage account name for this Virtual Machine."
-      }
-    },
     "vmLinuxOSVersion": {
       "type": "string"
     },
@@ -165,9 +159,10 @@
           },
           "osDisk": {
             "name": "[concat(parameters('vmNamePrefix'), add(copyIndex(),1), '-OsDisk')]",
-            "vhd": {
-              "uri": "[concat('https', '://', parameters('storageAccountName'), '.blob.core.windows.net', concat('/vhds/', concat(parameters('vmNamePrefix'), add(copyIndex(),1)), '-OsDisk','.vhd'))]"
-            },
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+          },
+            "diskSizeGB": 30,
             "caching": "ReadWrite",
             "createOption": "FromImage"
           }
@@ -180,21 +175,6 @@
           ]
         }
       }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "sku": {
-        "name": "Standard_LRS",
-        "tier": "Standard"
-      },
-      "kind": "Storage",
-      "name": "[parameters('storageAccountName')]",
-      "apiVersion": "2016-01-01",
-      "location": "[variables('location')]",
-      "tags": {},
-      "scale": null,
-      "properties": {},
-      "dependsOn": []
     }
   ],
   "outputs": {
